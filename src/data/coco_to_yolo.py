@@ -22,6 +22,8 @@ from pathlib import Path
 
 # Clases sin cajas suficientes para entrenar o evaluar (pig: 0, cow: 0, bat: 1, insect: 7)
 EXCLUDED = {'pig', 'cow', 'bat', 'insect'}
+# Clases cuyas cajas son la imagen completa [0, 0, W, H], no una localización real
+FULL_FRAME = {'car'}
 EMPTY = 'empty'
 ECCV_FILES = ['train', 'cis_val', 'trans_val', 'cis_test', 'trans_test']
 INTERNAL_VAL_FRAC = 0.10
@@ -65,7 +67,7 @@ def main(args):
             for f in ECCV_FILES}
 
     cat_name = {c['id']: c['name'] for c in meta['categories']}
-    classes = sorted(n for n in cat_name.values() if n != EMPTY and n not in EXCLUDED)
+    classes = sorted(n for n in cat_name.values() if n != EMPTY and n not in EXCLUDED | FULL_FRAME)
     class_idx = {n: i for i, n in enumerate(classes)}
 
     images = {im['id']: im for im in meta['images']}
@@ -81,13 +83,16 @@ def main(args):
     for img_id, im in images.items():
         species = image_labels[img_id] - {EMPTY}
         anns = [a for a in boxes[img_id] if cat_name[a['category_id']] != EMPTY]
+        box_species = {cat_name[a['category_id']] for a in anns}
         if not species and not anns:
             labels[img_id] = []
-        elif species & EXCLUDED or any(cat_name[a['category_id']] in EXCLUDED for a in anns):
+        elif (species | box_species) & EXCLUDED:
             excluded[img_id] = 'clase_excluida'
+        elif (species | box_species) & FULL_FRAME:
+            excluded[img_id] = 'cajas_imagen_completa'
         elif not anns:
             excluded[img_id] = 'animal_sin_caja'
-        elif species - {cat_name[a['category_id']] for a in anns}:
+        elif species - box_species:
             excluded[img_id] = 'cajas_incompletas'
         else:
             rows = []
