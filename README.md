@@ -34,7 +34,7 @@ scripts/              run_all.sh (comando único end-to-end)
 notebooks/            setup de Colab, EDA y figuras del informe
 results/              tablas de métricas (CSV)
 docs/                 bitácora de decisiones de entrenamiento
-reports/              informe (LaTeX NeurIPS), figuras y diapositivas
+reports/              informe (formato NeurIPS), figuras y diapositivas
 ```
 
 ## Dataset
@@ -63,6 +63,13 @@ pip install -r requirements.txt
 ```bash
 bash scripts/run_all.sh   # por implementar
 ```
+
+### En Google Colab
+
+1. Subir el dataset comprimido a `MyDrive/redes-parcial-p3/`.
+2. Abrir `notebooks/colab_setup.ipynb` y ejecutarlo: verifica la GPU, clona el repo, instala
+   dependencias y copia el dataset al disco local de Colab.
+3. En la misma sesión: `!bash scripts/run_all.sh`
 
 ## Equipo
 
