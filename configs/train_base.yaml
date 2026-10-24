@@ -1,0 +1,27 @@
+# Hiperparámetros comunes al modelo principal y al modelo E3.
+# Justificación de cada valor en docs/decisiones_entrenamiento.md
+
+imgsz: 640
+epochs: 40
+patience: 10          # early stopping si el mAP de validación no mejora en 10 épocas
+batch: -1             # autobatch: el mayor batch que cabe en ~60 % de la VRAM de la GPU
+optimizer: auto
+seed: 0
+deterministic: true
+workers: 8
+close_mosaic: 10      # desactiva mosaic en las últimas 10 épocas
+plots: true
+
+# Aumento de datos
+hsv_h: 0.015
+hsv_s: 0.7
+hsv_v: 0.4
+degrees: 0.0
+translate: 0.1
+scale: 0.5
+shear: 0.0
+perspective: 0.0
+fliplr: 0.5
+flipud: 0.0
+mosaic: 1.0
+mixup: 0.0
