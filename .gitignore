@@ -1,0 +1,29 @@
+# Datos (CCT-20 pesa varios GB: nunca se versiona)
+data/*
+!data/.gitkeep
+datasets/
+
+# Salidas de entrenamiento / pesos
+runs/
+weights/
+*.pt
+*.onnx
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Sistema / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# LaTeX
+*.aux
+*.log
+*.out
+*.synctex.gz

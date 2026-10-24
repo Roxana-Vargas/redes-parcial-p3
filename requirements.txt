@@ -1,0 +1,9 @@
+ultralytics>=8.3.0
+grad-cam>=1.5.0
+pandas>=2.0
+numpy>=1.24
+matplotlib>=3.7
+seaborn>=0.13
+opencv-python>=4.8
+pyyaml>=6.0
+tqdm>=4.66
