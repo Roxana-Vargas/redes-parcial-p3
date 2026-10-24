@@ -41,6 +41,7 @@ Registro de cada decisión de entrenamiento, con su justificación. Los valores 
 | Traslación / escala | 0.1 / 0.5 | Animales en distintas posiciones y distancias a la cámara |
 | Rotación / shear / perspectiva | 0 | Las cámaras están fijas y niveladas |
 | Mixup | 0.0 | Superponer imágenes generaría animales semitransparentes poco realistas |
+| Albumentations (por defecto en Ultralytics) | Blur, MedianBlur, ToGray y CLAHE, cada uno con p = 0.01 | Variaciones muy suaves de nitidez y contraste; ToGray imita las fotos infrarrojas |
 
 ## Hiperparámetros
 
@@ -55,15 +56,20 @@ Registro de cada decisión de entrenamiento, con su justificación. Los valores 
 
 ## Hardware y tiempos
 
-- GPU:
-- Batch elegido por autobatch:
-- Tiempo por época:
-- Épocas hasta early stopping:
+- GPU: NVIDIA L4 (22.5 GB), 12 CPU, 53 GB de RAM (Colab Pro).
+- Optimizador elegido por `auto`: AdamW, lr = 0.0005, momentum 0.9.
+- Batch elegido por autobatch: ~45 imágenes (9.1 GB de VRAM).
+- Velocidad (corrida de prueba): 1.8 iteraciones/s ≈ 80 imágenes/s; validación de 12,580 imágenes en ~1.5 min.
+- Tiempo real del modelo E3: ~88 s por época (11,201 imágenes de train + 2,573 de validación) ≈ 150 imágenes/s de entrenamiento. La GPU trabaja al 88–100 % y en su límite de potencia (72 W): el cuello de botella es la GPU, no la carga de imágenes.
+- Tiempo estimado del modelo principal: ~14 min por época (113,642 + 12,580 imágenes) → ~9 h para 40 épocas en L4.
+- Preparación de cada sesión de Colab: ~1.5 h para extraer las imágenes desde LILA.
+- Épocas hasta early stopping: modelo E3 → mejor época 29, detenido en la 39 (0.96 h).
+- Observación: en la corrida de prueba `cls_loss` fue ~191 (lo normal es 1–3). Con 83 % de imágenes vacías hay batches con muy pocos animales, y la pérdida de clasificación se normaliza por el número de objetos; el entrenamiento queda dominado por el fondo.
 
 ## Historial de experimentos
 
 | Fecha | Corrida | Datos | Cambio respecto al base | mAP@0.5 (val) | mAP@0.5:0.95 (val) | Notas |
 |---|---|---|---|---|---|---|
-| | prueba | data_full, 2 % | 1 época | | | Verificación del pipeline |
+| 24 oct | prueba | data_full, 2 % (2,273 imágenes) | 1 época | 0.0001 | 0.00001 | Pipeline verificado de punta a punta; mAP ~0 esperado |
 | | full_yolov8s | data_full | — | | | |
-| | eccv_yolov8s | data_eccv | — | | | |
+| 24 oct | eccv_yolov8s | data_eccv (val: eccv_cis_val) | — | 0.842 | 0.588 | Early stopping en la época 39 (mejor: 29). P = 0.91, R = 0.80. cls_loss de 3.3 a 0.39. Badger (1) y deer (2) con muy pocos ejemplos en validación |
