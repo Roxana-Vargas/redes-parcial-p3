@@ -1,0 +1,6 @@
+modelo,particion,recall,precision,vacias,vacias_con_fp,fp_por_vacia
+eccv_yolov8s,eccv_cis_test,0.8487,0.7953,1151,0.1633,0.2103
+eccv_yolov8s,eccv_trans_test,0.7021,0.5760,1732,0.3764,0.5127
+full_yolov8s,eccv_cis_test,0.8460,0.8430,1151,0.0443,0.0478
+full_yolov8s,eccv_trans_test,0.6818,0.7198,1732,0.0560,0.0612
+full_yolov8s,full_test,0.6240,0.6996,19892,0.0236,0.0253
