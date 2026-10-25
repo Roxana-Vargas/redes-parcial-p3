@@ -9,6 +9,9 @@ Ejemplos:
 Salidas en --results-dir:
   eval_<modelo>_<particion>.csv   métricas por especie, con el nº de cajas en train y en la partición evaluada
   eval_summary.csv                una fila por evaluación (se actualiza si ya existe esa combinación)
+
+Y en --project/<modelo>_<particion>/predictions.json todas las predicciones (formato COCO, coordenadas en
+píxeles de la imagen original). E4 y el análisis del umbral de confianza las usan sin volver a correr el modelo.
 """
 
 import argparse
@@ -40,7 +43,8 @@ def main(args):
         data = f.name
 
     m = YOLO(args.weights).val(data=data, split='test', imgsz=args.imgsz, batch=args.batch,
-                               project=args.project, name=f'{args.model}_{args.split}', exist_ok=True)
+                               project=args.project, name=f'{args.model}_{args.split}', exist_ok=True,
+                               save_json=True)
 
     train_counts = box_counts(args.results_dir, train_split)
     test_counts = box_counts(args.results_dir, args.split)
