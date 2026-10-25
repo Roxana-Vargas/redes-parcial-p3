@@ -1,0 +1,16 @@
+metrica,valor
+camara,46
+fotos,6035
+secuencias,2124
+periodo_registro,2011-05-03 a 2012-06-13
+umbral_confianza,0.25
+fotos_vacias_detectadas,0.443
+fotos_vacias_reales,0.116
+especies_detectadas,bird|bobcat|cat|coyote|deer|dog|fox|opossum|rabbit|raccoon|rodent|skunk|squirrel
+especies_reales,badger|bird|bobcat|cat|coyote|dog|opossum|rabbit|raccoon|rodent|skunk|squirrel
+eventos_detectados,1457
+eventos_reales,1873
+eventos_correctos,1102
+precision_eventos,0.756
+recall_eventos,0.588
+horas_corregidas,444
