@@ -62,7 +62,10 @@ Registro de cada decisión de entrenamiento, con su justificación. Los valores 
 ## Hardware y tiempos
 
 - GPU: NVIDIA L4 (22.5 GB), 12 CPU, 53 GB de RAM (Colab Pro).
-- Optimizador elegido por `auto`: AdamW, lr = 0.0005, momentum 0.9.
+- Optimizador elegido por `optimizer=auto`. Ultralytics decide según el número de iteraciones (épocas × imágenes / batch):
+  - Modelo E3 (~10k iteraciones): AdamW, lr ≈ 0.0005, momentum 0.9.
+  - Modelo principal y ablación de vacías (más de 10k iteraciones): MuSGD, lr = 0.01, momentum 0.9 (visto en el log de la ablación y en las columnas `lr/pg*` de `results.csv`).
+  - Consecuencia para E3: los dos modelos no usan el mismo optimizador. La comparación cis vs trans de cada modelo es válida; la comparación entre modelos lleva esa diferencia además del número de cámaras.
 - Batch elegido por autobatch: ~45 imágenes (9.1 GB de VRAM).
 - Velocidad (corrida de prueba): 1.8 iteraciones/s ≈ 80 imágenes/s; validación de 12,580 imágenes en ~1.5 min.
 - Tiempo real del modelo E3: ~88 s por época (11,201 imágenes de train + 2,573 de validación) ≈ 150 imágenes/s de entrenamiento. La GPU trabaja al 88–100 % y en su límite de potencia (72 W): el cuello de botella es la GPU, no la carga de imágenes.
