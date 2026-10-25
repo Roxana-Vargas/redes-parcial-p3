@@ -15,8 +15,13 @@ Registro de cada decisión de entrenamiento, con su justificación. Los valores 
 
 - **Se usan todas las vacías** de las cámaras de entrenamiento: 94,856 de 113,642 imágenes de `full_train` (83 %).
 - Cada vacía tiene un archivo de etiqueta **vacío explícito** (`labels/<id>.txt` sin líneas). Para YOLO eso significa "imagen sin objetos": el modelo aprende a no detectar nada en ella y cualquier predicción ahí cuenta como falso positivo.
-- Justificación: en el uso real la mayoría de las fotos de una cámara trampa están vacías (51.7 % en CCT), y un detector que genera falsos positivos en ellas hace perder tiempo a los especialistas. Entrenar con todas expone al modelo a la variedad real de fondos (viento, vegetación, cambios de luz).
-- Riesgo: con 83 % de fondo el modelo podría volverse conservador (menos recall) y las épocas son más largas. La guía de Ultralytics sugiere 0–10 % de fondo; aquí se prioriza la representatividad. Si sobra tiempo de GPU, ablación con una fracción de las vacías.
+- Justificación:
+  - **Lo pide el enunciado.** El entregable 1 exige el "manejo explícito de las imágenes vacías como clase de fondo": tratarlas como fondo, no quitarlas.
+  - **Es la dificultad central del problema.** El enunciado destaca que "la gran mayoría de las fotografías activadas por el sensor de movimiento no contienen ningún animal". Excluir las vacías eliminaría el desbalance de forma artificial y el modelo no se parecería al caso real (51.7 % de vacías en CCT).
+  - **El módulo de monitoreo las necesita.** E5 reporta la tasa de fotos vacías frente a fotos con fauna. Un modelo que nunca vio vacías detectaría animales en casi todas y esa tasa saldría inflada.
+  - **Los falsos positivos ocurren en las vacías.** Cada detección en una foto vacía es tiempo perdido de un especialista (E6). Entrenar con todas expone al modelo a la variedad real de fondos (viento, vegetación, cambios de luz).
+- Riesgo: con 83 % de fondo el modelo puede volverse conservador. La guía de Ultralytics sugiere 0–10 % de fondo; aquí se prioriza la representatividad. El resultado lo confirma en parte: precisión 0.71 y recall 0.51 en `full_val`. Es una hipótesis, porque el recall bajo también se explica por los animales pequeños y las cámaras no vistas.
+- **Ablación pendiente (si hay tiempo y unidades de GPU):** reentrenar el modelo principal con una fracción de las vacías, por ejemplo tantas como imágenes con animal (~19k en vez de 95k), con la misma configuración. Costo estimado: ~3.5 h en L4 (~6 unidades). Compararía el recall y los falsos positivos en fotos vacías de ambos modelos sobre `full_test`. Si no se hace, el compromiso se analiza variando el umbral de confianza del modelo principal, sin reentrenar.
 - Modelo E3: `eccv_train` no tiene vacías (así viene el archivo oficial ECCV 2018).
 
 ## Modelo y pesos iniciales
