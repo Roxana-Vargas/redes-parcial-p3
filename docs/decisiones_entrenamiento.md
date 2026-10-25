@@ -61,9 +61,10 @@ Registro de cada decisión de entrenamiento, con su justificación. Los valores 
 - Batch elegido por autobatch: ~45 imágenes (9.1 GB de VRAM).
 - Velocidad (corrida de prueba): 1.8 iteraciones/s ≈ 80 imágenes/s; validación de 12,580 imágenes en ~1.5 min.
 - Tiempo real del modelo E3: ~88 s por época (11,201 imágenes de train + 2,573 de validación) ≈ 150 imágenes/s de entrenamiento. La GPU trabaja al 88–100 % y en su límite de potencia (72 W): el cuello de botella es la GPU, no la carga de imágenes.
-- Tiempo estimado del modelo principal: ~14 min por época (113,642 + 12,580 imágenes) → ~9 h para 40 épocas en L4.
+- Tiempo real del modelo principal: 10.87 h para 40 épocas en L4 (~16 min por época con 113,642 imágenes de train + 12,580 de validación).
 - Preparación de cada sesión de Colab: ~1.5 h para extraer las imágenes desde LILA.
-- Épocas hasta early stopping: modelo E3 → mejor época 29, detenido en la 39 (0.96 h).
+- Épocas hasta early stopping: modelo E3 → mejor época 29, detenido en la 39 (0.96 h). Modelo principal → mejor época 30; completó las 40 (el early stopping habría actuado justo en la 40).
+- Curvas del modelo principal: el mAP de validación sube rápido hasta la época 10 (0.48), se estabiliza desde la 25 (~0.55) y baja levemente después de la 30, cuando se apaga mosaic (época 31): la pérdida de entrenamiento sigue bajando (cls_loss 0.73 → 0.43) mientras la de validación sube un poco. Es un inicio de sobreajuste; más épocas no habrían ayudado.
 - Observación: en la corrida de prueba `cls_loss` fue ~191 (lo normal es 1–3). Con 83 % de imágenes vacías hay batches con muy pocos animales, y la pérdida de clasificación se normaliza por el número de objetos; el entrenamiento queda dominado por el fondo.
 
 ## Historial de experimentos
@@ -71,5 +72,5 @@ Registro de cada decisión de entrenamiento, con su justificación. Los valores 
 | Fecha | Corrida | Datos | Cambio respecto al base | mAP@0.5 (val) | mAP@0.5:0.95 (val) | Notas |
 |---|---|---|---|---|---|---|
 | 24 oct | prueba | data_full, 2 % (2,273 imágenes) | 1 época | 0.0001 | 0.00001 | Pipeline verificado de punta a punta; mAP ~0 esperado |
-| | full_yolov8s | data_full | — | | | |
+| 25 oct | full_yolov8s | data_full (val: full_val, 19 cámaras no vistas) | — | 0.556 | 0.363 | Mejor época 30 de 40 (10.87 h). P = 0.71, R = 0.51. Lizard con AP 0 (22 cajas, ninguna detectada) y rodent con recall 0.13 (animales pequeños). Badger y mountain_lion no aparecen en full_val |
 | 24 oct | eccv_yolov8s | data_eccv (val: eccv_cis_val) | — | 0.842 | 0.588 | Early stopping en la época 39 (mejor: 29). P = 0.91, R = 0.80. cls_loss de 3.3 a 0.39. Badger (1) y deer (2) con muy pocos ejemplos en validación |
