@@ -115,7 +115,8 @@ def main(args):
             continue
         W, H = size[stem]
         x, y, w, h = d['bbox']
-        dets.append({'image_id': stem, 'category_id': int(d['category_id']), 'score': d['score'],
+        # Ultralytics numera las clases desde 1 en predictions.json (class_map = 1..nc) y desde 0 en los labels
+        dets.append({'image_id': stem, 'category_id': int(d['category_id']) - 1, 'score': d['score'],
                      'bbox': [x / W * CANVAS, y / H * CANVAS, w / W * CANVAS, h / H * CANVAS]})
     print(f'{len(stems):,} imágenes, {len(annotations):,} cajas reales, {len(dets):,} predicciones')
 
