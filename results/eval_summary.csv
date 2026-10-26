@@ -4,3 +4,4 @@ full_yolov8s,eccv_cis_test,12858,0.7660,0.5111,0.8081,0.7565
 full_yolov8s,eccv_trans_test,18140,0.4526,0.2704,0.5947,0.4308
 eccv_yolov8s,eccv_cis_test,12858,0.7457,0.4848,0.8120,0.7181
 eccv_yolov8s,eccv_trans_test,18140,0.4204,0.2612,0.6467,0.4066
+full_bg18786,full_test,43292,0.4849,0.3106,0.6972,0.4763
