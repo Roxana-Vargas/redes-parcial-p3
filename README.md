@@ -7,6 +7,8 @@ entrenamiento con las imágenes vacías como fondo, mAP por especie, generalizac
 (particiones *cis* / *trans* de ECCV 2018) con EigenCAM, robustez por oclusión y tamaño de caja, y un
 módulo de reglas que convierte las detecciones en un reporte de actividad por especie y periodo del día.
 
+**Informe:** [`reports/informe/Informe_Pregunta3_Grupo3.pdf`](reports/informe/Informe_Pregunta3_Grupo3.pdf)
+
 ## Ejecución en un solo comando
 
 ```bash
@@ -123,4 +125,5 @@ python src/robustness/annotate_occlusion.py
 
 ## Autores
 
-Grupo de cinco estudiantes (nombres en el informe) — Examen Parcial 2026-II, Sección B.
+Grupo 3 — Roxana Vargas, Nicolas Nieto Alvarado, Sebastián Villanueva y Victor Tello.
+Examen Parcial 2026-II, Sección B.
