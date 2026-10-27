@@ -91,6 +91,7 @@ annotations/             occlusion_test.csv: oclusión anotada a mano en 298 caj
 notebooks/               colab_setup, eda, entrenamiento, evaluacion
 results/                 tablas (CSV) y artefactos de entrenamiento
 reports/figures/         figuras del EDA, la evaluación y el informe
+reports/informe/         informe final (PDF, formato NeurIPS)
 docs/                    bitácora de decisiones de entrenamiento
 ```
 
