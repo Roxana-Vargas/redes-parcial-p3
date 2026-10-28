@@ -20,14 +20,22 @@ TRAIN=0
 [[ "${1:-}" == "--train" ]] && TRAIN=1
 RELEASE=https://github.com/Roxana-Vargas/redes-parcial-p3/releases/download/pesos-v1
 EVAL=runs/eval
+# python3 en Linux/WSL/macOS, python en Windows; la variable PYTHON permite elegir otro intérprete
+PY=${PYTHON:-}
+if [[ -z $PY ]]; then
+    for c in python3 python; do   # en Windows, python3 puede ser un alias de la Microsoft Store que no funciona
+        if "$c" -c "import sys" >/dev/null 2>&1; then PY=$c; break; fi
+    done
+fi
+[[ -n $PY ]] || { echo "No se encontró Python (python3 o python)" >&2; exit 1; }
 
 step() { echo; echo "==> $*"; }
 
 step "1. Etiquetas YOLO y particiones"
-python src/data/coco_to_yolo.py
+"$PY" src/data/coco_to_yolo.py
 [[ -f data/raw/.images_ok ]] || touch data/raw/.images_ok   # marca de extracción que usa fix_jpegs.py
-python src/data/fix_jpegs.py
-python src/data/subsample_background.py
+"$PY" src/data/fix_jpegs.py
+"$PY" src/data/subsample_background.py
 
 step "2. Modelos"
 for m in full_yolov8s eccv_yolov8s full_bg18786; do
@@ -38,7 +46,7 @@ for m in full_yolov8s eccv_yolov8s full_bg18786; do
             eccv_yolov8s) data=data/yolo/data_eccv.yaml ;;
             full_bg18786) data=data/yolo/data_full_bg18786.yaml ;;
         esac
-        python src/train/train.py --data $data --name $m
+        "$PY" src/train/train.py --data $data --name $m
     elif [[ ! -f $w ]]; then
         mkdir -p "$(dirname $w)"
         curl -L --fail -o $w $RELEASE/$m.pt
@@ -46,34 +54,34 @@ for m in full_yolov8s eccv_yolov8s full_bg18786; do
 done
 
 step "3. Evaluación: E2 (por especie) y E3 (cis vs trans)"
-python src/eval/evaluate.py --weights runs/full_yolov8s/weights/best.pt --data data/yolo/data_full.yaml \
+"$PY" src/eval/evaluate.py --weights runs/full_yolov8s/weights/best.pt --data data/yolo/data_full.yaml \
     --split full_test --model full_yolov8s --project $EVAL
-python src/eval/evaluate.py --weights runs/full_bg18786/weights/best.pt --data data/yolo/data_full.yaml \
+"$PY" src/eval/evaluate.py --weights runs/full_bg18786/weights/best.pt --data data/yolo/data_full.yaml \
     --split full_test --model full_bg18786 --project $EVAL
 for split in eccv_cis_test eccv_trans_test; do
-    python src/eval/evaluate.py --weights runs/eccv_yolov8s/weights/best.pt --data data/yolo/data_eccv.yaml \
+    "$PY" src/eval/evaluate.py --weights runs/eccv_yolov8s/weights/best.pt --data data/yolo/data_eccv.yaml \
         --split $split --model eccv_yolov8s --project $EVAL
-    python src/eval/evaluate.py --weights runs/full_yolov8s/weights/best.pt --data data/yolo/data_full.yaml \
+    "$PY" src/eval/evaluate.py --weights runs/full_yolov8s/weights/best.pt --data data/yolo/data_full.yaml \
         --split $split --model full_yolov8s --project $EVAL
 done
-python src/eval/threshold_analysis.py --eval-dir $EVAL
+"$PY" src/eval/threshold_analysis.py --eval-dir $EVAL
 
 step "4. E3: EigenCAM"
-python src/eval/eigencam.py --weights runs/eccv_yolov8s/weights/best.pt --model eccv_yolov8s
-python src/eval/eigencam.py --weights runs/full_yolov8s/weights/best.pt --model full_yolov8s
-python src/eval/eigencam.py --weights runs/eccv_yolov8s/weights/best.pt --model eccv_yolov8s_capa15 --layer 15
+"$PY" src/eval/eigencam.py --weights runs/eccv_yolov8s/weights/best.pt --model eccv_yolov8s
+"$PY" src/eval/eigencam.py --weights runs/full_yolov8s/weights/best.pt --model full_yolov8s
+"$PY" src/eval/eigencam.py --weights runs/eccv_yolov8s/weights/best.pt --model eccv_yolov8s_capa15 --layer 15
 
 step "5. E4: tamaño de caja y oclusión"
-python src/robustness/size_eval.py --pred $EVAL/full_yolov8s_full_test/predictions.json \
+"$PY" src/robustness/size_eval.py --pred $EVAL/full_yolov8s_full_test/predictions.json \
     --split full_test --model full_yolov8s
-python src/robustness/occlusion_eval.py --eval-dir $EVAL --models full_yolov8s full_bg18786
-python src/robustness/occlusion_figure.py --img-dir data/raw/cct_images
+"$PY" src/robustness/occlusion_eval.py --eval-dir $EVAL --models full_yolov8s full_bg18786
+"$PY" src/robustness/occlusion_figure.py --img-dir data/raw/cct_images
 
 step "6. E5: monitoreo en la cámara 46 (no vista)"
-python src/monitoring/report.py --weights runs/full_yolov8s/weights/best.pt --location 46
+"$PY" src/monitoring/report.py --weights runs/full_yolov8s/weights/best.pt --location 46
 
 step "7. Figuras del informe"
-python src/eval/figures.py
+"$PY" src/eval/figures.py
 
 echo
 echo "Listo: tablas en results/ y figuras en reports/figures/"
