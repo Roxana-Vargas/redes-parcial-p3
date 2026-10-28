@@ -17,10 +17,16 @@ bash scripts/run_all.sh            # con los pesos entrenados (release pesos-v1)
 bash scripts/run_all.sh --train    # reentrenando los tres modelos (~17 h en una L4)
 ```
 
-Requiere las imágenes y anotaciones de CCT en `data/raw/` (ver [Datos](#datos)) y una GPU con CUDA.
+Requisitos:
+
+- Python 3.10 o superior y una GPU con CUDA (usamos una NVIDIA L4 en Google Colab Pro). PyTorch se
+  instala con `ultralytics`.
+- Las imágenes y anotaciones de CCT en `data/raw/` (ver [Datos](#datos)).
+- Unos 150 GB de disco: las imágenes extraídas ocupan ~105 GB (el `.tar` se puede borrar después).
+
 Con los pesos publicados, la ejecución completa tarda alrededor de 1 h en una L4. Todas las tablas
 quedan en `results/` y las figuras en `reports/figures/`; los resultados de nuestra corrida ya están
-versionados ahí.
+versionados ahí, así que se pueden revisar sin ejecutar nada.
 
 En Google Colab: ejecutar `notebooks/colab_setup.ipynb` (descarga y extrae las imágenes, ~1.5 h) y
 luego `!bash scripts/run_all.sh` en la misma sesión, o seguir `notebooks/evaluacion.ipynb` paso a paso.
@@ -48,12 +54,20 @@ Detalle de las decisiones de entrenamiento en [`docs/decisiones_entrenamiento.md
 | `full_bg18786` | Como el principal, pero con 18,786 vacías al azar | Ablación de E1 |
 
 Los pesos (`best.pt`) están en el release [`pesos-v1`](https://github.com/Roxana-Vargas/redes-parcial-p3/releases/tag/pesos-v1);
-`run_all.sh` los descarga en `runs/<modelo>/weights/best.pt`. Las curvas, la configuración y el notebook
-ejecutado del entrenamiento están en `results/entrenamiento/`.
+`run_all.sh` los descarga en `runs/<modelo>/weights/best.pt`.
+
+Evidencia del entrenamiento en `results/entrenamiento/`:
+
+- `<modelo>/`: configuración (`args.yaml`), métricas por época (`results.csv`), curvas, curva PR y matriz de confusión.
+- `entrenamiento_colab.ipynb`: notebook de Colab ejecutado con el entrenamiento de los modelos principal y E3.
+- `evaluacion_ablacion_colab.ipynb`: notebook de Colab ejecutado con las evaluaciones, EigenCAM, el monitoreo
+  y el entrenamiento de la ablación.
 
 ## Datos
 
-Caltech Camera Traps en LILA BC: <https://lila.science/datasets/caltech-camera-traps>
+Caltech Camera Traps en LILA BC: <https://lila.science/datasets/caltech-camera-traps>. De esa página se
+descargan las imágenes (`cct_images.tar.gz`), los metadatos, las cajas, la división en cámaras de
+entrenamiento y validación, y las anotaciones de ECCV 2018 (`eccv_18_annotations.tar.gz`), y se ordenan así:
 
 ```
 data/raw/
@@ -61,8 +75,12 @@ data/raw/
   annotations/
     caltech_images_20210113.json       metadatos de todas las fotos (cámara, fecha, secuencia)
     caltech_bboxes_20200316.json       cajas
+    CaltechCameraTrapsSplits_v0.json   división de LILA en 100 cámaras de train y 40 de val
     eccv_18_annotation_files/          partición oficial ECCV 2018 (train, cis/trans val y test)
 ```
+
+A pesar de su extensión, `cct_images.tar.gz` es un `.tar` sin comprimir: se extrae con `tar -xf`.
+`notebooks/colab_setup.ipynb` hace la descarga y la extracción en Colab.
 
 `src/data/coco_to_yolo.py` convierte las anotaciones a formato YOLO y crea las particiones:
 
@@ -88,12 +106,26 @@ src/
                          occlusion_eval / occlusion_figure (oclusión)
   monitoring/            rules (reglas de monitoreo) y report (demo en una cámara)
 annotations/             occlusion_test.csv: oclusión anotada a mano en 298 cajas de full_test
-notebooks/               colab_setup, eda, entrenamiento, evaluacion
+notebooks/               colab_setup (descarga y prepara los datos en Colab), eda (análisis
+                         exploratorio con ejemplos), entrenamiento (los tres modelos),
+                         evaluacion (E2 a E6, y una sección que solo lee los resultados)
 results/                 tablas (CSV) y artefactos de entrenamiento
 reports/figures/         figuras del EDA, la evaluación y el informe
 reports/informe/         informe final (PDF, formato NeurIPS)
 docs/                    bitácora de decisiones de entrenamiento
 ```
+
+## Resultados por entregable
+
+| Entregable | Tablas en `results/` | Figuras en `reports/figures/` |
+|---|---|---|
+| Datos y particiones | `dataset_summary.csv`, `dataset_exclusions.csv` | `eda_*.png` |
+| E1 · Entrenamiento y ablación | `entrenamiento/`, `fp_vacias.csv`, `umbral_full_bg18786_full_test.csv` | `umbral_compromiso.png` |
+| E2 · mAP por especie | `eval_full_yolov8s_full_test.csv`, `eval_summary.csv` | `e2_ap_por_especie.png` |
+| E3 · cis vs trans | `eval_*_eccv_*.csv`, `fp_vacias.csv`, `e3_eigencam_*.csv` | `e3_cis_vs_trans.png`, `e3_brecha_especie.png`, `e3_fp_vacias.png`, `e3_eigencam_*.png` |
+| E4 · Tamaño y oclusión | `e4_tamano_*.csv`, `e4_oclusion_full_test.csv` | `e4_tamano.png`, `e4_oclusion_*.png` |
+| E5 · Monitoreo (cámara 46) | `e5_*_cam46.csv` | `e5_actividad_cam46.png` |
+| E6 · Umbral de confianza | `umbral_*.csv` | `umbral_compromiso.png` |
 
 ## Módulo de monitoreo (E5)
 

@@ -3,7 +3,8 @@
 #
 # Requisitos (ver README):
 #   data/raw/cct_images/      imágenes de Caltech Camera Traps (cct_images.tar.gz de LILA, extraído)
-#   data/raw/annotations/     caltech_images_20210113.json, caltech_bboxes_20200316.json y eccv_18_annotation_files/
+#   data/raw/annotations/     caltech_images_20210113.json, caltech_bboxes_20200316.json,
+#                             CaltechCameraTrapsSplits_v0.json y eccv_18_annotation_files/
 #   GPU con CUDA (la evaluación completa tarda ~1 h en una L4; el entrenamiento, ~17 h)
 #
 # Uso:
